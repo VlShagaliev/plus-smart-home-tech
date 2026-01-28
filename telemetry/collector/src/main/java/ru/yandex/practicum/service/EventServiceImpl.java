@@ -4,37 +4,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.kafka.telemetry.event.ActionTypeAvro;
-import ru.yandex.practicum.kafka.telemetry.event.ClimateSensorAvro;
-import ru.yandex.practicum.kafka.telemetry.event.ConditionOperationAvro;
-import ru.yandex.practicum.kafka.telemetry.event.ConditionTypeAvro;
-import ru.yandex.practicum.kafka.telemetry.event.DeviceActionAvro;
-import ru.yandex.practicum.kafka.telemetry.event.DeviceAddedEventAvro;
-import ru.yandex.practicum.kafka.telemetry.event.DeviceRemovedEventAvro;
-import ru.yandex.practicum.kafka.telemetry.event.DeviceTypeAvro;
-import ru.yandex.practicum.kafka.telemetry.event.HubEventAvro;
-import ru.yandex.practicum.kafka.telemetry.event.LightSensorAvro;
-import ru.yandex.practicum.kafka.telemetry.event.MotionSensorAvro;
-import ru.yandex.practicum.kafka.telemetry.event.ScenarioAddedEventAvro;
-import ru.yandex.practicum.kafka.telemetry.event.ScenarioConditionAvro;
-import ru.yandex.practicum.kafka.telemetry.event.ScenarioRemovedEventAvro;
-import ru.yandex.practicum.kafka.telemetry.event.SensorEventAvro;
-import ru.yandex.practicum.kafka.telemetry.event.SwitchSensorAvro;
-import ru.yandex.practicum.kafka.telemetry.event.TemperatureSensorAvro;
 import ru.yandex.practicum.kafka.KafkaClientProducer;
-import ru.yandex.practicum.models.DeviceAction;
-import ru.yandex.practicum.models.ClimateSensorEvent;
-import ru.yandex.practicum.models.DeviceAddedEvent;
-import ru.yandex.practicum.models.DeviceRemovedEvent;
-import ru.yandex.practicum.models.HubEvent;
-import ru.yandex.practicum.models.LightSensorEvent;
-import ru.yandex.practicum.models.MotionSensorEvent;
-import ru.yandex.practicum.models.ScenarioAddedEvent;
-import ru.yandex.practicum.models.ScenarioCondition;
-import ru.yandex.practicum.models.ScenarioRemovedEvent;
-import ru.yandex.practicum.models.SensorEvent;
-import ru.yandex.practicum.models.SwitchSensorEvent;
-import ru.yandex.practicum.models.TemperatureSensorEvent;
+import ru.yandex.practicum.kafka.telemetry.event.*;
+import ru.yandex.practicum.models.*;
 
 import java.util.List;
 
@@ -134,6 +106,7 @@ public class EventServiceImpl implements EventService {
                 .setPayload(payload)
                 .build();
     }
+
 
     private DeviceActionAvro map(DeviceAction action) {
         return DeviceActionAvro.newBuilder()
