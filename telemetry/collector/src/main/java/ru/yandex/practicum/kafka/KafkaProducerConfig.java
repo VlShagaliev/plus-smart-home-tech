@@ -42,7 +42,7 @@ public class KafkaProducerConfig {
             @Override
             public void stop() {
                 if (producer != null) {
-                    producer.flush();
+                    //producer.flush();
                     producer.close();
                 }
             }
