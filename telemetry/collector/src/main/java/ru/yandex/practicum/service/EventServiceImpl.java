@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.avro.specific.SpecificRecordBase;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.kafka.KafkaClientProducer;
 import ru.yandex.practicum.kafka.telemetry.event.*;
@@ -16,8 +17,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class EventServiceImpl implements EventService {
     private final KafkaClientProducer kafkaClientProducer;
-    private final String topicSensor = "telemetry.sensors.v1";
-    private final String topicHub = "telemetry.hubs.v1";
+
+    @Value(value = "${topics.sensors-events}")
+    private String topicSensor;
+
+    @Value(value = "${topics.hubs-events}")
+    private String topicHub ;
 
     @Override
     public void publishToSensors(SensorEvent event) {
