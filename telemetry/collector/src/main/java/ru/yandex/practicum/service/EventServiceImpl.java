@@ -23,9 +23,6 @@ public class EventServiceImpl implements EventService {
     public void publishToSensors(SensorEvent event) {
         ProducerRecord<String, SpecificRecordBase> record = new ProducerRecord<>(
                 topicSensor,                    // Имя топика куда будет осуществлена запись
-                null,                     // Номер партиции (если null, то используется ключ для вычисления раздела)
-                event.getTimestamp().toEpochMilli(), // Метка времени события
-                event.getHubId(),       // Ключ события
                 mapToAvro(event)    // Значение события
         );
         log.info("Добавлено сообщение в брокер по типу SensorEvent");
@@ -76,10 +73,7 @@ public class EventServiceImpl implements EventService {
     public void publishToHubs(HubEvent event) {
         log.info("Добавлено сообщение в брокер по типу HubEvent");
         ProducerRecord<String, SpecificRecordBase> record = new ProducerRecord<>(
-                topicHub,                    // Имя топика куда будет осуществлена запись
-                null,                     // Номер партиции (если null, то используется ключ для вычисления раздела)
-                event.getTimestamp().toEpochMilli(), // Метка времени события
-                event.getHubId(),       // Ключ события
+                topicHub,
                 mapToAvro(event)    // Значение события
         );
         kafkaClientProducer.getProducer().send(record);

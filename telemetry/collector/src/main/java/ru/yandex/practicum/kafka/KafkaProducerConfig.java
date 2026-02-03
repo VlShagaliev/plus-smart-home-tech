@@ -40,6 +40,7 @@ public class KafkaProducerConfig {
                 producer = new KafkaProducer<>(config);
             }
 
+            @PreDestroy
             @Override
             public void stop() {
                 if (producer != null) {
