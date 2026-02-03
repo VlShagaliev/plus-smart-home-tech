@@ -1,5 +1,6 @@
 package ru.yandex.practicum.kafka;
 
+import jakarta.annotation.PreDestroy;
 import org.springframework.beans.factory.annotation.Value;
 import org.apache.avro.specific.SpecificRecordBase;
 import org.apache.kafka.clients.producer.KafkaProducer;
@@ -42,7 +43,6 @@ public class KafkaProducerConfig {
             @Override
             public void stop() {
                 if (producer != null) {
-                    //producer.flush();
                     producer.close();
                 }
             }

@@ -16,11 +16,19 @@ import java.util.List;
 @RequiredArgsConstructor
 public class EventServiceImpl implements EventService {
     private final KafkaClientProducer kafkaClientProducer;
+    private final String topicSensor = "telemetry.sensors.v1";
+    private final String topicHub = "telemetry.hubs.v1";
 
     @Override
     public void publishToSensors(SensorEvent event) {
-        final String topic = "telemetry.sensors.v1";
-        ProducerRecord<String, SpecificRecordBase> record = new ProducerRecord<>(topic, mapToAvro(event));
+        ProducerRecord<String, SpecificRecordBase> record = new ProducerRecord<>(
+                topicSensor,                    // Имя топика куда будет осуществлена запись
+                null,                     // Номер партиции (если null, то используется ключ для вычисления раздела)
+                event.getTimestamp().toEpochMilli(), // Метка времени события
+                event.getHubId(),       // Ключ события
+                mapToAvro(event)    // Значение события
+        );
+        log.info("Добавлено сообщение в брокер по типу SensorEvent");
         kafkaClientProducer.getProducer().send(record);
     }
 
@@ -66,8 +74,15 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public void publishToHubs(HubEvent event) {
-        final String topic = "telemetry.hubs.v1";
-        kafkaClientProducer.getProducer().send(new ProducerRecord<>(topic, mapToAvro(event)));
+        log.info("Добавлено сообщение в брокер по типу HubEvent");
+        ProducerRecord<String, SpecificRecordBase> record = new ProducerRecord<>(
+                topicHub,                    // Имя топика куда будет осуществлена запись
+                null,                     // Номер партиции (если null, то используется ключ для вычисления раздела)
+                event.getTimestamp().toEpochMilli(), // Метка времени события
+                event.getHubId(),       // Ключ события
+                mapToAvro(event)    // Значение события
+        );
+        kafkaClientProducer.getProducer().send(record);
     }
 
     private HubEventAvro mapToAvro(HubEvent event) {
