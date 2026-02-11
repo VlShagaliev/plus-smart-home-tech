@@ -1,11 +1,13 @@
 package ru.yandex.practicum.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 
 @Entity
-@Data
+@Setter
+@Getter
 @ToString
 @Table(name = "scenarios")
 public class Scenario {
