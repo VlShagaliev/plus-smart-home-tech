@@ -10,7 +10,6 @@
     </parent>
 
     <artifactId>interaction-api</artifactId>
-
     <dependencies>
         <dependency>
             <groupId>org.projectlombok</groupId>
