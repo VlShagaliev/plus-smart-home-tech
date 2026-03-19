@@ -11,5 +11,10 @@
 
     <artifactId>infra</artifactId>
     <packaging>pom</packaging>
+    <modules>
+        <module>gateway</module>
+        <module>discovery-server</module>
+        <module>config-server</module>
+    </modules>
 
 </project>

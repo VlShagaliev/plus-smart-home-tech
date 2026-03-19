@@ -144,4 +144,8 @@ public class AggregationStarter {
         return (oldState.getTimestamp().isAfter(event.getTimestamp())) ||
                 (oldState.getData().equals(event.getPayload()));
     }
+
+    public void stop() {
+        consumer.wakeup();
+    }
 }
