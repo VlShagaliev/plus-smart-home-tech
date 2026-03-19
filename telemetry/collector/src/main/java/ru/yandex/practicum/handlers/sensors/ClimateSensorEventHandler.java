@@ -14,7 +14,7 @@ import ru.yandex.practicum.mapper.TimestampMapper;
 @Component
 @RequiredArgsConstructor
 public class ClimateSensorEventHandler implements SensorEventHandler {
-    @Value(value = "${topics.sensors-events}")
+    @Value(value = "telemetry.sensors.v1")
     private String topicSensor;
 
 

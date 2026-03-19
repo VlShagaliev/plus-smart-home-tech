@@ -14,7 +14,7 @@ import ru.yandex.practicum.mapper.TimestampMapper;
 @Component
 @RequiredArgsConstructor
 public class ScenarioAddedEventHandler implements HubEventHandler {
-    @Value(value = "${topics.hubs-events}")
+    @Value(value = "telemetry.hubs.v1")
     private String topicHub;
     private final KafkaClientProducer kafkaClientProducer;
 
