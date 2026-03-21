@@ -8,8 +8,19 @@ import ru.yandex.practicum.grpc.HubRouterGrpcClient;
 import ru.yandex.practicum.grpc.telemetry.event.ActionTypeProto;
 import ru.yandex.practicum.grpc.telemetry.event.DeviceActionProto;
 import ru.yandex.practicum.grpc.telemetry.event.DeviceActionRequest;
-import ru.yandex.practicum.kafka.telemetry.event.*;
-import ru.yandex.practicum.model.*;
+import ru.yandex.practicum.kafka.telemetry.event.ClimateSensorAvro;
+import ru.yandex.practicum.kafka.telemetry.event.LightSensorAvro;
+import ru.yandex.practicum.kafka.telemetry.event.MotionSensorAvro;
+import ru.yandex.practicum.kafka.telemetry.event.SensorStateAvro;
+import ru.yandex.practicum.kafka.telemetry.event.SensorsSnapshotAvro;
+import ru.yandex.practicum.kafka.telemetry.event.SwitchSensorAvro;
+import ru.yandex.practicum.kafka.telemetry.event.TemperatureSensorAvro;
+import ru.yandex.practicum.model.Action;
+import ru.yandex.practicum.model.Condition;
+import ru.yandex.practicum.model.ConditionOperation;
+import ru.yandex.practicum.model.ConditionType;
+import ru.yandex.practicum.model.Scenario;
+import ru.yandex.practicum.model.SensorEventWrapper;
 import ru.yandex.practicum.repository.ActionRepository;
 import ru.yandex.practicum.repository.ConditionRepository;
 
@@ -162,11 +173,10 @@ public class SnapshotHandler {
                 return data.getCo2Level();
             };
 
-            case HUMIDITY ->
-                    func = x -> {
-                        ClimateSensorAvro data = (ClimateSensorAvro) x.getData();
-                        return data.getHumidity();
-                    };
+            case HUMIDITY -> func = x -> {
+                ClimateSensorAvro data = (ClimateSensorAvro) x.getData();
+                return data.getHumidity();
+            };
             default -> {
                 return null;
             }

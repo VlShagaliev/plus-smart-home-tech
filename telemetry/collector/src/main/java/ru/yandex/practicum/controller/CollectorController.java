@@ -16,7 +16,6 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-
 @GrpcService
 public class CollectorController extends CollectorControllerGrpc.CollectorControllerImplBase {
     private final Map<SensorEventProto.PayloadCase, SensorEventHandler> sensorEventHandlers;
@@ -72,5 +71,4 @@ public class CollectorController extends CollectorControllerGrpc.CollectorContro
             ));
         }
     }
-
 }

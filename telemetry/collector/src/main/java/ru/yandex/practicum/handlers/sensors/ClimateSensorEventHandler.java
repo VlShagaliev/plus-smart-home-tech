@@ -16,8 +16,6 @@ import ru.yandex.practicum.mapper.TimestampMapper;
 public class ClimateSensorEventHandler implements SensorEventHandler {
     @Value(value = "${topics.sensors-events}")
     private String topicSensor;
-
-
     private final KafkaClientProducer kafkaClientProducer;
 
     @Override

@@ -28,7 +28,6 @@ public class SnapshotProcessor {
     private final KafkaConsumer<String, SensorsSnapshotAvro> consumer = new KafkaConsumer<>(getConsumerProperties());
     private final SnapshotHandler handler;
 
-
     public void start() {
         try {
             Runtime.getRuntime().addShutdownHook(new Thread(consumer::wakeup));
@@ -68,6 +67,9 @@ public class SnapshotProcessor {
     }
 
     private static void manageOffsets(ConsumerRecord<String, SensorsSnapshotAvro> record) {
-        currentOffsets.put(new TopicPartition(record.topic(), record.partition()), new OffsetAndMetadata(record.offset() + 1));
+        currentOffsets.put(
+                new TopicPartition(record.topic(), record.partition()),
+                new OffsetAndMetadata(record.offset() + 1)
+        );
     }
 }
