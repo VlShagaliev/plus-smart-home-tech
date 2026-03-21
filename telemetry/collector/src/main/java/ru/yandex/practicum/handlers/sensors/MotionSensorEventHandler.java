@@ -14,8 +14,7 @@ import ru.yandex.practicum.mapper.TimestampMapper;
 @Component
 @RequiredArgsConstructor
 public class MotionSensorEventHandler implements SensorEventHandler {
-
-    @Value(value = "telemetry.sensors.v1")
+    @Value(value = "${topics.sensors-events}")
     private String topicSensor;
     private final KafkaClientProducer kafkaClientProducer;
 
