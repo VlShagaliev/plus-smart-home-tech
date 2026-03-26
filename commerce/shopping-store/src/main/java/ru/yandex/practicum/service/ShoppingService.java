@@ -1,10 +1,7 @@
 package ru.yandex.practicum.service;
 
 
-import ru.yandex.practicum.dto.Pageable;
-import ru.yandex.practicum.dto.ProductCategory;
-import ru.yandex.practicum.dto.ProductDto;
-import ru.yandex.practicum.dto.SetProductQuantityStateRequest;
+import ru.yandex.practicum.dto.*;
 
 import java.util.Collection;
 import java.util.UUID;
@@ -18,7 +15,7 @@ public interface ShoppingService {
 
     void removeProductFromStore(UUID productId);
 
-    void setProductQuantityState(SetProductQuantityStateRequest request);
+    void setProductQuantityState(UUID productId, QuantityState quantityState);
 
     Collection<ProductDto> searchProducts(ProductCategory category, Pageable params);
 }
