@@ -50,7 +50,6 @@ public class ShoppingStoreController implements ShoppingStoreOperations {
         return true;
     }
 
-
     @Override
     public boolean updateProductQuantity(SetProductQuantityStateRequest request) {
         shoppingService.setProductQuantityState(request);
