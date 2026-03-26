@@ -22,11 +22,11 @@ public class ShoppingStoreController implements ShoppingStoreOperations {
     private final ShoppingService shoppingService;
 
     @Override
-    public Collection<ProductDto> searchProducts(String category, Pageable params) {
+    public Collection<ProductDto> searchProducts(ProductCategory category, Pageable params) {
         log.info("searchProducts called");
         log.info("category: {}", category);
         log.info("params: {}", params);
-        return shoppingService.searchProducts(ProductCategory.valueOf(category), params);
+        return shoppingService.searchProducts(category, params);
     }
 
     @Override
