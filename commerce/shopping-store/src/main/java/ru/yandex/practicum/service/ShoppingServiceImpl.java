@@ -2,6 +2,8 @@ package ru.yandex.practicum.service;
 
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.dto.Pageable;
@@ -15,8 +17,8 @@ import ru.yandex.practicum.model.Product;
 import ru.yandex.practicum.repository.ShoppingStoreRepository;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -67,10 +69,10 @@ public class ShoppingServiceImpl implements ShoppingService {
     @Override
     @Transactional(readOnly = true)
     public Collection<ProductDto> searchProducts(ProductCategory category, Pageable params) {
-        return productRepository.findAllByProductCategory(category, params)
-                .stream()
-                .map(ProductMapper.INSTANCE::mapToProductDto)
-                .collect(Collectors.toSet());
+        Sort sort = Sort.by(params.getSort().stream().map(Sort.Order::asc).toList());
+        PageRequest pageable = PageRequest.of(params.getPage(), params.getSize(), sort);
+        List<Product> products = productRepository.getProductsByProductCategory(category, pageable);
+        return productMapper.mapToListProductDto(products);
     }
 
     private Product getProductFromStore(UUID productId) {
