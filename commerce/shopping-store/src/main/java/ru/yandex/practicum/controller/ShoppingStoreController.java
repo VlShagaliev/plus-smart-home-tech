@@ -19,11 +19,8 @@ public class ShoppingStoreController implements ShoppingStoreOperations {
     private final ShoppingService shoppingService;
 
     @Override
-    public Collection<ProductDto> searchProducts(String category, Pageable params) {
-        log.info("searchProducts called");
-        log.info("category: {}", category);
-        log.info("params: {}", params);
-        return shoppingService.searchProducts(category, params);
+    public Collection<ProductDto> searchProducts(String category, int page, int size, String sort) {
+        return shoppingService.searchProducts(category, page, size, sort);
     }
 
     @Override

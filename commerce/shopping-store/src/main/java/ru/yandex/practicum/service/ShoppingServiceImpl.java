@@ -12,9 +12,7 @@ import ru.yandex.practicum.mapper.ProductMapper;
 import ru.yandex.practicum.model.Product;
 import ru.yandex.practicum.repository.ShoppingStoreRepository;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -64,9 +62,12 @@ public class ShoppingServiceImpl implements ShoppingService {
 
     @Override
     @Transactional(readOnly = true)
-    public Collection<ProductDto> searchProducts(String category, Pageable params) {
-        Sort sort = Sort.by(params.getSort().stream().map(Sort.Order::asc).toList());
-        PageRequest pageable = PageRequest.of(params.getPage(), params.getSize(), sort);
+    public Collection<ProductDto> searchProducts(String category, int page, int size, String sortIn) {
+        List<String> sortedBy = new ArrayList<>();
+        String[] sortInArr = sortIn.split(",");
+        sortedBy.addAll(Arrays.stream(sortInArr).toList());
+        Sort sort = Sort.by(sortedBy.stream().map(Sort.Order::asc).toList());
+        PageRequest pageable = PageRequest.of(page, size, sort);
         List<Product> products = productRepository.getProductsByProductCategory(ProductCategory.valueOf(category), pageable);
         return productMapper.mapToListProductDto(products);
     }

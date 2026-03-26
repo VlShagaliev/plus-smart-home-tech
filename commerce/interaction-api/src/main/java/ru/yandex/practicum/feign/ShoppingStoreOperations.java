@@ -18,7 +18,9 @@ public interface ShoppingStoreOperations {
 
     @GetMapping
     Collection<ProductDto> searchProducts(@RequestParam("category") String category,
-                                          @RequestParam(required = false) Pageable params);
+                                          @RequestParam(value = "page", defaultValue = "0") int page,
+                                          @RequestParam(value = "size", defaultValue = "20") int size,
+                                          @RequestParam(value = "sort", defaultValue = "productId,ASC") String sort);
 
     @GetMapping("/{productId}")
     ProductDto getProductById(@PathVariable UUID productId);

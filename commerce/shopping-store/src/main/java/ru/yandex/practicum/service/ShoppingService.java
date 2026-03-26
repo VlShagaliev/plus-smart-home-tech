@@ -17,5 +17,5 @@ public interface ShoppingService {
 
     void setProductQuantityState(UUID productId, QuantityState quantityState);
 
-    Collection<ProductDto> searchProducts(String category, Pageable params);
+    Collection<ProductDto> searchProducts(String category, int page, int size, String sort);
 }
