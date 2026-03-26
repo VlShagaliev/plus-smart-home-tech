@@ -1,6 +1,7 @@
 package ru.yandex.practicum.service;
 
 
+import org.springframework.data.domain.Page;
 import ru.yandex.practicum.dto.*;
 
 import java.util.Collection;
@@ -17,5 +18,5 @@ public interface ShoppingService {
 
     void setProductQuantityState(UUID productId, QuantityState quantityState);
 
-    Collection<ProductDto> searchProducts(String category, int page, int size, String sort);
+    Page<ProductDto> searchProducts(String category, int page, int size, String sort);
 }

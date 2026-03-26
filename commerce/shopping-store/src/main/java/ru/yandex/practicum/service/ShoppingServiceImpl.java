@@ -2,6 +2,7 @@ package ru.yandex.practicum.service;
 
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -62,7 +63,7 @@ public class ShoppingServiceImpl implements ShoppingService {
 
     @Override
     @Transactional(readOnly = true)
-    public Collection<ProductDto> searchProducts(String category, int page, int size, String sortIn) {
+    public Page<ProductDto> searchProducts(String category, int page, int size, String sortIn) {
         Sort sort;
         if (sortIn != null && !sortIn.trim().isEmpty()) {
             List<Sort.Order> sortOrders = parseSortCriteria(sortIn);
@@ -77,9 +78,8 @@ public class ShoppingServiceImpl implements ShoppingService {
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Invalid product category: " + category);
         }
-
-        List<Product> products = productRepository.getProductsByProductCategory(productCategory, pageable);
-        return productMapper.mapToListProductDto(products);
+        return productRepository.findAllByProductCategory(productCategory, pageable)
+                .map(ProductMapper.INSTANCE::mapToProductDto);
     }
 
     private Product getProductFromStore(UUID productId) {

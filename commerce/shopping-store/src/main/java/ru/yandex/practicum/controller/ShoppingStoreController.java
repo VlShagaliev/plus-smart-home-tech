@@ -2,6 +2,7 @@ package ru.yandex.practicum.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.dto.*;
@@ -19,7 +20,7 @@ public class ShoppingStoreController implements ShoppingStoreOperations {
     private final ShoppingService shoppingService;
 
     @Override
-    public Collection<ProductDto> searchProducts(String category, int page, int size, String sort) {
+    public Page<ProductDto> searchProducts(String category, int page, int size, String sort) {
         return shoppingService.searchProducts(category, page, size, sort);
     }
 
