@@ -63,16 +63,57 @@ public class ShoppingServiceImpl implements ShoppingService {
     @Override
     @Transactional(readOnly = true)
     public Collection<ProductDto> searchProducts(String category, int page, int size, String sortIn) {
-        List<String> sortedBy = new ArrayList<>();
-        String[] sortInArr = sortIn.split(",");
-        sortedBy.addAll(Arrays.stream(sortInArr).toList());
-        Sort sort = Sort.by(sortedBy.stream().map(Sort.Order::asc).toList());
+        Sort sort;
+        if (sortIn != null && !sortIn.trim().isEmpty()) {
+            List<Sort.Order> sortOrders = parseSortCriteria(sortIn);
+            sort = Sort.by(sortOrders);
+        } else {
+            sort = Sort.unsorted();
+        }
         PageRequest pageable = PageRequest.of(page, size, sort);
-        List<Product> products = productRepository.getProductsByProductCategory(ProductCategory.valueOf(category), pageable);
+        ProductCategory productCategory;
+        try {
+            productCategory = ProductCategory.valueOf(category.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid product category: " + category);
+        }
+
+        List<Product> products = productRepository.getProductsByProductCategory(productCategory, pageable);
         return productMapper.mapToListProductDto(products);
     }
 
     private Product getProductFromStore(UUID productId) {
         return productRepository.findById(productId).orElseThrow(() -> new ProductNotFoundException("Product is not found"));
+    }
+
+    private List<Sort.Order> parseSortCriteria(String sortCriteria) {
+        String[] parts = sortCriteria.split(",");
+        List<Sort.Order> orders = new ArrayList<>();
+
+        for (int i = 0; i < parts.length; i += 2) {
+            String field = parts[i].trim();
+            String direction = parts[i + 1].trim().toUpperCase();
+
+            if (field.isEmpty()) {
+                throw new IllegalArgumentException("Sort field cannot be empty");
+            }
+
+            Sort.Order order;
+            switch (direction) {
+                case "ASC":
+                    order = Sort.Order.asc(field);
+                    break;
+                case "DESC":
+                    order = Sort.Order.desc(field);
+                    break;
+                default:
+                    throw new IllegalArgumentException(
+                            "Invalid sort direction: " + direction + ". Use 'ASC' or 'DESC'"
+                    );
+            }
+            orders.add(order);
+        }
+
+        return orders;
     }
 }
