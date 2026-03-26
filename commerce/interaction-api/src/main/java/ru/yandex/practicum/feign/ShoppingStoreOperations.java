@@ -2,6 +2,7 @@ package ru.yandex.practicum.feign;
 
 import jakarta.validation.Valid;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.dto.Pageable;
 import ru.yandex.practicum.dto.ProductCategory;
@@ -18,7 +19,7 @@ public interface ShoppingStoreOperations {
     ProductDto addProduct(@Valid @RequestBody ProductDto product);
 
     @GetMapping
-    Collection<ProductDto> searchProducts(@RequestParam ProductCategory category, @RequestParam Pageable params);
+    Collection<ProductDto> searchProducts(@RequestParam ProductCategory category, @RequestBody(required = false) Pageable params);
 
     @GetMapping("/{productId}")
     ProductDto getProductById(@PathVariable UUID productId);
@@ -31,5 +32,6 @@ public interface ShoppingStoreOperations {
 
 
     @PostMapping("/quantityState")
+    @ResponseStatus(HttpStatus.OK)
     boolean updateProductQuantity(@Valid @RequestBody SetProductQuantityStateRequest request);
 }
