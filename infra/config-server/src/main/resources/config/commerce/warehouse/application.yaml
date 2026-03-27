@@ -17,4 +17,4 @@ spring:
     username: smart
     password: secret
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/smart-hub
+    url: jdbc:postgresql://localhost:5432/smart-hub-warehouse
