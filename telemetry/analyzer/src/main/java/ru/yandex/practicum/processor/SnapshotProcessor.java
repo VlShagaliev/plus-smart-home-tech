@@ -28,6 +28,22 @@ public class SnapshotProcessor {
     private final KafkaConsumer<String, SensorsSnapshotAvro> consumer = new KafkaConsumer<>(getConsumerProperties());
     private final SnapshotHandler handler;
 
+    private static Properties getConsumerProperties() {
+        Properties properties = new Properties();
+        properties.put(ConsumerConfig.CLIENT_ID_CONFIG, "snapshotConsumer");
+        properties.put(ConsumerConfig.GROUP_ID_CONFIG, "snapshot.analyzing");
+        properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        properties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, VoidDeserializer.class);
+        properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, SensorSnapshotDeserializer.class);
+        return properties;
+    }
+
+    private static void manageOffsets(ConsumerRecord<String, SensorsSnapshotAvro> record) {
+        currentOffsets.put(
+                new TopicPartition(record.topic(), record.partition()),
+                new OffsetAndMetadata(record.offset() + 1)
+        );
+    }
 
     public void start() {
         try {
@@ -55,19 +71,5 @@ public class SnapshotProcessor {
                 log.info("Consumer close");
             }
         }
-    }
-
-    private static Properties getConsumerProperties() {
-        Properties properties = new Properties();
-        properties.put(ConsumerConfig.CLIENT_ID_CONFIG, "snapshotConsumer");
-        properties.put(ConsumerConfig.GROUP_ID_CONFIG, "snapshot.analyzing");
-        properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
-        properties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, VoidDeserializer.class);
-        properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, SensorSnapshotDeserializer.class);
-        return properties;
-    }
-
-    private static void manageOffsets(ConsumerRecord<String, SensorsSnapshotAvro> record) {
-        currentOffsets.put(new TopicPartition(record.topic(), record.partition()), new OffsetAndMetadata(record.offset() + 1));
     }
 }
