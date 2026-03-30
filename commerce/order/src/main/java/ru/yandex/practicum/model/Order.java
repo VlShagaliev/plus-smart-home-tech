@@ -16,6 +16,7 @@ import lombok.ToString;
 import org.hibernate.annotations.UuidGenerator;
 import ru.yandex.practicum.dto.OrderState;
 
+import java.math.BigDecimal;
 import java.util.Map;
 import java.util.UUID;
 
@@ -53,9 +54,9 @@ public class Order {
 
     Boolean fragile;
 
-    Double totalPrice;
+    BigDecimal totalPrice;
 
-    Double deliveryPrice;
+    BigDecimal deliveryPrice;
 
-    Double productPrice;
+    BigDecimal productPrice;
 }

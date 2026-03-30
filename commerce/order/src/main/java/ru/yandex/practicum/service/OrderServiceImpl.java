@@ -22,6 +22,7 @@ import ru.yandex.practicum.mapper.OrderMapper;
 import ru.yandex.practicum.model.Order;
 import ru.yandex.practicum.repository.OrderRepository;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -146,7 +147,7 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public OrderDto calculateProductCost(UUID orderId) {
         Order order = getOrder(orderId);
-        double productPrice = paymentClient.productCost(orderMapper.mapToOrderDto(order));
+        BigDecimal productPrice = paymentClient.productCost(orderMapper.mapToOrderDto(order));
         order.setProductPrice(productPrice);
         order = orderRepository.save(order);
         return orderMapper.mapToOrderDto(order);
@@ -156,7 +157,7 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public OrderDto calculateDeliveryCost(UUID orderId) {
         Order order = getOrder(orderId);
-        double deliveryPrice = deliveryClient.deliveryCost(orderMapper.mapToOrderDto(order));
+        BigDecimal deliveryPrice = deliveryClient.deliveryCost(orderMapper.mapToOrderDto(order));
         order.setDeliveryPrice(deliveryPrice);
         order = orderRepository.save(order);
         return orderMapper.mapToOrderDto(order);
@@ -166,7 +167,7 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public OrderDto calculateTotalCost(UUID orderId) {
         Order order = getOrder(orderId);
-        double totalPrice = paymentClient.getTotalCost(orderMapper.mapToOrderDto(order));
+        BigDecimal totalPrice = paymentClient.getTotalCost(orderMapper.mapToOrderDto(order));
         order.setTotalPrice(totalPrice);
         order = orderRepository.save(order);
         return orderMapper.mapToOrderDto(order);

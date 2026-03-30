@@ -8,6 +8,7 @@ import ru.yandex.practicum.dto.OrderDto;
 import ru.yandex.practicum.feign.DeliveryOperations;
 import ru.yandex.practicum.service.DeliveryService;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @RestController
@@ -37,7 +38,7 @@ public class DeliveryController implements DeliveryOperations {
     }
 
     @Override
-    public double deliveryCost(OrderDto orderDto) {
+    public BigDecimal deliveryCost(OrderDto orderDto) {
         return deliveryService.calculateDeliveryCost(orderDto);
     }
 }

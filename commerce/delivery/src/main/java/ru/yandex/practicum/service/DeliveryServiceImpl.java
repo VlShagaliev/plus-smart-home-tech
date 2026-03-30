@@ -15,6 +15,7 @@ import ru.yandex.practicum.model.Address;
 import ru.yandex.practicum.model.Delivery;
 import ru.yandex.practicum.repository.DeliveryRepository;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Service
@@ -25,7 +26,7 @@ public class DeliveryServiceImpl implements DeliveryService {
     private final OrderOperations orderClient;
     private final WarehouseOperations warehouseClient;
 
-    private static final double BASE_RATE = 5.0;
+    private static final BigDecimal BASE_RATE = BigDecimal.valueOf(5.0);
     private static final double WAREHOUSE_1_ADDRESS_MULTIPLIER = 1;
     private static final double WAREHOUSE_2_ADDRESS_MULTIPLIER = 2;
     private static final double FRAGILE_MULTIPLIER = 0.2;
@@ -63,24 +64,26 @@ public class DeliveryServiceImpl implements DeliveryService {
 
     @Override
     @Transactional(readOnly = true)
-    public Double calculateDeliveryCost(OrderDto order) {
+    public BigDecimal calculateDeliveryCost(OrderDto order) {
         Delivery delivery = getDelivery(order.getDeliveryId());
         Address warehouseAddress = delivery.getFromAddress();
         Address destinationAddress = delivery.getToAddress();
 
-        double totalCost = BASE_RATE;
+        BigDecimal totalCost = BASE_RATE;
 
-        totalCost += warehouseAddress.getCity().equals("ADDRESS_1")
-                ? totalCost * WAREHOUSE_1_ADDRESS_MULTIPLIER : totalCost * WAREHOUSE_2_ADDRESS_MULTIPLIER;
+        totalCost.add(warehouseAddress.getCity().equals("ADDRESS_1") ?
+                totalCost.multiply(BigDecimal.valueOf(WAREHOUSE_1_ADDRESS_MULTIPLIER)) :
+                totalCost.multiply(BigDecimal.valueOf(WAREHOUSE_2_ADDRESS_MULTIPLIER)));
 
-        totalCost += Boolean.TRUE.equals(order.getFragile()) ? totalCost * FRAGILE_MULTIPLIER : 0;
+        totalCost.add(Boolean.TRUE.equals(order.getFragile()) ? totalCost.multiply(BigDecimal.valueOf(FRAGILE_MULTIPLIER)) : BigDecimal.valueOf(0));
 
-        totalCost += order.getDeliveryWeight() * WEIGHT_MULTIPLIER;
+        totalCost.add(BigDecimal.valueOf(order.getDeliveryWeight()).multiply(BigDecimal.valueOf(WEIGHT_MULTIPLIER)));
 
-        totalCost += order.getDeliveryVolume() * VOLUME_MULTIPLIER;
+        totalCost.add(BigDecimal.valueOf(order.getDeliveryVolume()).multiply(BigDecimal.valueOf(VOLUME_MULTIPLIER)));
 
-        totalCost += warehouseAddress.getStreet().equals(destinationAddress.getStreet())
-                ? 0 : totalCost * STREET_MULTIPLIER;
+        totalCost.add(warehouseAddress.getStreet().equals(destinationAddress.getStreet()) ?
+                BigDecimal.valueOf(0) :
+                totalCost.multiply(BigDecimal.valueOf(STREET_MULTIPLIER)));
 
         return totalCost;
     }

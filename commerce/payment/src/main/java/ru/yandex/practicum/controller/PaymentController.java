@@ -8,6 +8,7 @@ import ru.yandex.practicum.dto.PaymentDto;
 import ru.yandex.practicum.feign.PaymentOperations;
 import ru.yandex.practicum.service.PaymentService;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @RestController
@@ -22,7 +23,7 @@ public class PaymentController implements PaymentOperations {
     }
 
     @Override
-    public double getTotalCost(OrderDto orderDto) {
+    public BigDecimal getTotalCost(OrderDto orderDto) {
         return paymentService.calculateTotalCost(orderDto);
     }
 
@@ -32,7 +33,7 @@ public class PaymentController implements PaymentOperations {
     }
 
     @Override
-    public double productCost(OrderDto orderDto) {
+    public BigDecimal productCost(OrderDto orderDto) {
         return paymentService.calculateProductCost(orderDto);
     }
 

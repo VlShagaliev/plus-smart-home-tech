@@ -15,6 +15,7 @@ import ru.yandex.practicum.mapper.PaymentMapper;
 import ru.yandex.practicum.model.Payment;
 import ru.yandex.practicum.repository.PaymentRepository;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -40,26 +41,26 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     @Transactional(readOnly = true)
-    public double calculateProductCost(OrderDto order) {
-        List<Double> pricesList = new ArrayList<>();
+    public BigDecimal calculateProductCost(OrderDto order) {
+        List<BigDecimal> pricesList = new ArrayList<>();
         Map<UUID, Integer> orderProducts = order.getProducts();
 
         orderProducts.forEach((id, quantity) -> {
             ProductDto product = shoppingStoreClient.getProductById(id);
-            double totalProductPrice = product.getPrice() * quantity;
+            BigDecimal totalProductPrice = BigDecimal.valueOf(product.getPrice()).multiply(BigDecimal.valueOf(quantity));
             pricesList.add(totalProductPrice);
         });
 
-        return pricesList.stream().mapToDouble(Double::doubleValue).sum();
+        return BigDecimal.valueOf(pricesList.stream().mapToDouble(BigDecimal::doubleValue).sum());
     }
 
     @Override
     @Transactional(readOnly = true)
-    public double calculateTotalCost(OrderDto order) {
+    public BigDecimal calculateTotalCost(OrderDto order) {
         validatePaymentInfo(order.getProductPrice(), order.getDeliveryPrice());
-        double productsPrice = order.getProductPrice();
-        double deliveryPrice = order.getDeliveryPrice();
-        return deliveryPrice + productsPrice + (productsPrice * VAT_RATE);
+        BigDecimal productsPrice = BigDecimal.valueOf(order.getProductPrice());
+        BigDecimal deliveryPrice = BigDecimal.valueOf(order.getDeliveryPrice());
+        return deliveryPrice.add(productsPrice).add(productsPrice.multiply(BigDecimal.valueOf(VAT_RATE)));
     }
 
     @Override
