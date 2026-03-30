@@ -3,7 +3,7 @@ server:
 
 spring:
   application:
-    name: warehouse
+    name: payment
   jpa:
     hibernate:
       ddl-auto: none
@@ -17,4 +17,4 @@ spring:
     username: postgres
     password: 824322
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/smart-hub-warehouse
+    url: jdbc:postgresql://localhost:5432/smart-hub-payment

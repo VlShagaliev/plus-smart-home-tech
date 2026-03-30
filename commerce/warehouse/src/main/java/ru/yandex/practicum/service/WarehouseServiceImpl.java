@@ -3,22 +3,21 @@ package ru.yandex.practicum.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.yandex.practicum.dto.AddProductToWarehouseRequest;
-import ru.yandex.practicum.dto.AddressDto;
-import ru.yandex.practicum.dto.BookedProductsDto;
-import ru.yandex.practicum.dto.NewProductInWarehouseRequest;
-import ru.yandex.practicum.dto.QuantityState;
-import ru.yandex.practicum.dto.SetProductQuantityStateRequest;
-import ru.yandex.practicum.dto.ShoppingCartDto;
+import ru.yandex.practicum.dto.*;
 import ru.yandex.practicum.exceptions.NoSpecifiedProductInWarehouseException;
 import ru.yandex.practicum.exceptions.ProductInShoppingCartLowQuantityInWarehouse;
 import ru.yandex.practicum.exceptions.SpecifiedProductAlreadyInWarehouseException;
+import ru.yandex.practicum.feign.OrderOperations;
 import ru.yandex.practicum.feign.ShoppingStoreOperations;
+import ru.yandex.practicum.mapper.OrderBookingMapper;
 import ru.yandex.practicum.mapper.WarehouseProductMapper;
+import ru.yandex.practicum.model.OrderBooking;
 import ru.yandex.practicum.model.WarehouseProduct;
+import ru.yandex.practicum.repository.OrderBookingRepository;
 import ru.yandex.practicum.repository.WarehouseRepository;
 
 import java.security.SecureRandom;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
@@ -43,6 +42,9 @@ public class WarehouseServiceImpl implements WarehouseService {
     private final WarehouseRepository warehouseRepository;
     private final WarehouseProductMapper warehouseProductMapper;
     private final ShoppingStoreOperations shoppingStoreOperations;
+    private final OrderOperations orderClient;
+    private final OrderBookingRepository orderBookingRepository;
+    private final OrderBookingMapper orderBookingMapper;
 
     @Override
     @Transactional
@@ -71,12 +73,55 @@ public class WarehouseServiceImpl implements WarehouseService {
     @Override
     @Transactional(readOnly = true)
     public BookedProductsDto checkShoppingCart(ShoppingCartDto shoppingCart) {
-        UUID shoppingCartId = shoppingCart.getShoppingCartId();
         Map<UUID, Integer> products = shoppingCart.getProducts();
         Supplier<Stream<WarehouseProduct>> streamSupplier =
                 () -> warehouseRepository.findAllById(products.keySet()).stream();
-        checkProductQuantity(streamSupplier.get(), products, shoppingCartId);
+        checkProductQuantity(streamSupplier.get(), products);
         return calculateDeliveryParams(streamSupplier);
+    }
+
+    @Override
+    @Transactional
+    public void returnProductsToWarehouse(Map<UUID, Integer> products) {
+        List<AddProductToWarehouseRequest> requests = products.entrySet().stream()
+                .map(entry -> new AddProductToWarehouseRequest(entry.getKey(), entry.getValue()))
+                .toList();
+        requests.forEach(this::increaseProductQuantity);
+    }
+
+    @Override
+    public BookedProductsDto assemblyProducts(AssemblyProductsForOrderRequest request) {
+        Map<UUID, Integer> products = request.getProducts();
+        Supplier<Stream<WarehouseProduct>> streamSupplier =
+                () -> warehouseRepository.findAllById(products.keySet()).stream();
+
+        try {
+            checkProductQuantity(streamSupplier.get(), products);
+        } catch (ProductInShoppingCartLowQuantityInWarehouse exception) {
+            orderClient.assemblyFailed(request.getOrderId());
+            throw new ProductInShoppingCartLowQuantityInWarehouse(exception.getMessage());
+        }
+        orderClient.assembly(request.getOrderId());
+
+        BookedProductsDto bookedProductsParams = calculateDeliveryParams(streamSupplier);
+        products.forEach((key, value) -> {
+            WarehouseProduct product = getWarehouseProduct(key);
+            int oldQuantity = product.getQuantity();
+            int decreasingQuantity = value;
+            product.setQuantity(oldQuantity - decreasingQuantity);
+            warehouseRepository.save(product);
+            updateQuantityInShoppingStore(product);
+        });
+        OrderBooking orderBooking = orderBookingMapper.mapToOrderBooking(bookedProductsParams, request);
+        orderBooking = orderBookingRepository.save(orderBooking);
+        return orderBookingMapper.mapToBookingDto(orderBooking);
+    }
+
+    @Override
+    public void shipToDelivery(ShippedToDeliveryRequest request) {
+        OrderBooking booking = orderBookingRepository.findByOrderId(request.getOrderId());
+        booking.setDeliveryId(request.getDeliveryId());
+        orderBookingRepository.save(booking);
     }
 
     private WarehouseProduct getWarehouseProduct(UUID id) {
@@ -93,10 +138,10 @@ public class WarehouseServiceImpl implements WarehouseService {
     }
 
 
-    private void checkProductQuantity(Stream<WarehouseProduct> stream, Map<UUID, Integer> products, UUID cartId) {
+    private void checkProductQuantity(Stream<WarehouseProduct> stream, Map<UUID, Integer> products) {
         if (stream.anyMatch(product -> product.getQuantity() < products.get(product.getProductId()))) {
             throw new ProductInShoppingCartLowQuantityInWarehouse(
-                    String.format("Quantity of products is less than necessary for shopping cart ID: %s", cartId)
+                    String.format("Quantity of products is less than necessary")
             );
         }
     }
